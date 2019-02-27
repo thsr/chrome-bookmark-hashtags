@@ -9,14 +9,15 @@
             <span v-if="node.url"><br><span class="url"><a :href="node.url" target="_blank">{{ node.url }}</a></span></span>
 
         </li>
-
+        <transition-group name="fade-slide-y" mode="in-out" appear>
         <tree-menu 
+            :key="node.id"
             v-if="showChildren || expandAll"
             v-for="child in node.children" 
             :node="child"
             :depth="depth + 1"
             :expandAll="expandAll"
-            ></tree-menu>
+            ></tree-menu></transition-group>
 
     </ul>
 
@@ -64,6 +65,17 @@ export default {
 
 <style scoped lang="scss">
 
+
+.fade-slide-y-enter-active, .fade-slide-y-leave-active{
+    transition: all .2s;
+}
+
+.fade-slide-y-enter, .fade-slide-y-leave-to{
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+
 .container {
     width: 300px;
     margin: 0 auto;
@@ -97,6 +109,7 @@ ul.node {
 
     .url {
         font-size:80%;
+        margin-left:10px;
     }
 
 

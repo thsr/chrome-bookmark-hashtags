@@ -92,6 +92,7 @@ export default {
 
                 this.bookmarks = bookmarks[0]
                 this.originalBookmarks = bookmarks[0]
+                console.log(bookmarks[0])
 
                 //compute list of hashtags
                 var hashtagCounts = {}
