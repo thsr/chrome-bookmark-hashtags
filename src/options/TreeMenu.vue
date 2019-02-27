@@ -1,13 +1,13 @@
 <template>
     <ul class="node">
 
-        <li class="label" @click="toggleChildren">
-            <div :style="indent" :class="titleClasses">
-                <span v-if="node.children"><i class="fa" :class="iconClasses" aria-hidden="true"></i> </span>
-                <span v-else><img :src="favicon"/> </span>
-                <span class="title">{{ node.title }}</span>
-                <span v-if="node.url"> <span class="url"><a :href="node.url" target="_blank"><!-- <i class="fa fa-external-link" aria-hidden="true"></i>  -->{{ node.url }}</a></span></span>
-            </div>
+        <li class="label" @click="toggleChildren" :class="hasChildren">
+
+            <span v-if="node.children">&nbsp;<i class="fa" :class="faFolderOpenClose" aria-hidden="true"></i>&nbsp; </span>
+            <span v-else><img class="favicon" :src="favicon"/> </span>
+            <span class="title">{{ node.title }}</span>
+            <span v-if="node.url"><br><span class="url"><a :href="node.url" target="_blank">{{ node.url }}</a></span></span>
+
         </li>
 
         <tree-menu 
@@ -36,25 +36,22 @@ export default {
             var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/g
             var groups = regex.exec(this.node.url)
             if (groups) {
-                return "chrome://favicon/" + groups[2] + "://" + groups[3]
+                return "chrome://favicon/https://" + groups[3]
             } else {
                 return "chrome://favicon"
             }
 
         },
 
-        iconClasses() {
+        faFolderOpenClose() {
             return {
                 'fa-folder': !this.showChildren && !this.expandAll,
                 'fa-folder-open': this.showChildren || this.expandAll
             }
         },
-        titleClasses() {
+        hasChildren() {
             return { 'has-children': this.node.children }
         },
-        indent() {
-            return true//{ transform: `translate(${this.depth * 50}px)` }
-        }
     },
     methods: {
         toggleChildren() {
@@ -65,7 +62,7 @@ export default {
 </script>
 
 
-<style lang="scss">
+<style scoped lang="scss">
 
 .container {
     width: 300px;
@@ -76,11 +73,18 @@ ul.node {
     list-style-type: none;
 }
 
+.has-children {
+    cursor: pointer;
+    background: #eee;
+}
+
 .label {
     vertical-align: middle;
 
+    border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding: 5px 0;
+    margin-bottom: -1px;
+    padding: 5px;
     
     .title, .url {
         display: inline-block;
@@ -95,10 +99,12 @@ ul.node {
         font-size:80%;
     }
 
-    .has-children {
-        cursor: pointer;
-    }
+
 }
 
+img.favicon {
+    width:16px;
+    height:16px;
+}
 
 </style>
