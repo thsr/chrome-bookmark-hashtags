@@ -1,10 +1,21 @@
 <template>
   <div>
-    <input v-model="searchTerm"><button @click="filterSearch">filter</button>
+    <form  @submit.prevent="filterSearch" action>
+        <input v-model="searchTerm" placeholder="search in title...">
+    </form>
+
     <br><br>
+    <span v-for="tag in hashtags">{{tag.name}} &nbsp; </span>
+    <form @submit.prevent="filterSearchTags" action>
+        <input v-model="searchTermTags" placeholder="search in tags...">
+    </form>
+
+    <br><br>
+
     <button @click="toggleExpandAll">expand all</button>
+
     <br><br>
-    <!-- <tree :tree-data="bookmarks"></tree> -->
+
     <tree-menu 
            :node="bookmarks" 
            :depth="0"
@@ -43,7 +54,9 @@ export default {
             bookmarks: {},
             originalBookmarks: {},
             expandAll: true,
-            searchTerm: "test"
+            searchTerm: "",
+            searchTermTags: "",
+            hashtags: []
         }
     },
 
@@ -58,22 +71,38 @@ export default {
             }
 
             var f = o => {
-                var regex = new RegExp(this.searchTerm, "i")
+                var regex = new RegExp(this.searchTerm, "gi")
                 var isAvailable = false
                 isAvailable = regex.test(o.title)
 
-                if (o.title && isAvailable) {
-                    return true
-                }
-
-                if (o.children) {
-                    return (o.children = o.children.filter(f)).length
-                }
+                if (o.title && isAvailable) { return true }
+                if (o.children) { return (o.children = o.children.filter(f)).length }
             }
 
             var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
 
-            var res = [bookmarksCopy].map(copy).filter(f)
+            var res = [bookmarksCopy].filter(f)
+
+            this.bookmarks = res[0]
+        },
+
+        filterSearchTags: function () {
+            var f = o => {
+                var regex = new RegExp(this.searchTerm, "gi")
+                var isAvailable = false
+                var stitchedTags = ""
+                if (o.tags) stitchedTags = o.tags.join("\n")
+                isAvailable = regex.test(stitchedTags)
+
+                if (o.tags && isAvailable) { 
+                    return true
+                }
+                if (o.children) { return (o.children = o.children.filter(f)).length }
+            }
+
+            var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
+
+            var res = [bookmarksCopy].filter(f)
 
             this.bookmarks = res[0]
         },
@@ -99,9 +128,37 @@ export default {
 
     created: function () {
         chrome.bookmarks.getTree((itemTree) => {
-            this.bookmarks = itemTree[0]
-            this.originalBookmarks = itemTree[0]
-            console.log(itemTree[0])
+            var bookmarks = []
+            var hashtags = []
+
+            var mapTags = o => {
+                var res = o
+                if (res.title) {
+                    var foundTags = res.title.match(/#([^\s#]+)/gi)
+                    if (foundTags && foundTags.length > -1) {
+                        res.tags = foundTags
+                        hashtags.push(...foundTags)
+                    }
+                }
+                if (res.children) { res.children = res.children.map(mapTags) }
+                return res
+            }
+
+            bookmarks = itemTree.map(mapTags)
+
+            this.bookmarks = bookmarks[0]
+            this.originalBookmarks = bookmarks[0]
+
+            var hashtagCounts = {}
+            for (var i = 0; i < hashtags.length; i++) {
+                hashtagCounts[hashtags[i]] = 1 + (hashtagCounts[hashtags[i]] || 0);
+            }
+            hashtagCounts = Object.keys(hashtagCounts).map(function(key) {
+              return {name: String(key), count: hashtagCounts[key]}
+            });
+            console.log(hashtagCounts)
+
+            this.hashtags = hashtagCounts
 
             // itemTree.forEach((item) => {
             //     this.processNode(item);

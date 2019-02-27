@@ -6,7 +6,7 @@
         <span v-if="node.children"><i class="fa" :class="iconClasses" aria-hidden="true"></i> </span>
         <span v-else><i class="fa fa-file-o" aria-hidden="true"></i> </span>
         {{ node.title }}
-        <span v-if="node.url"> <span class="url"><a :href="node.url" target="_blank">{{ node.url }}</a></span></span>
+        <span v-if="node.url"> <span class="url"><a :href="node.url" target="_blank"><!-- <i class="fa fa-external-link" aria-hidden="true"></i>  -->{{ node.url }}</a></span></span>
       </div>
     </li>
 
@@ -71,6 +71,7 @@ ul.node {
   padding: 5px 0;
 
   .url {
+    font-size:80%;
     display: inline-block;
     vertical-align: bottom;
     padding:0;
