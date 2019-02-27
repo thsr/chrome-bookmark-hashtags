@@ -6,7 +6,7 @@
 
     <br><br>
 
-    <span v-for="tag in hashtags">{{tag.name}} &nbsp; </span>
+    <span v-for="tag in hashtags"><span :style="tagSize(tag.count)">{{tag.name}}</span> &nbsp; </span>
 
     <br><br>
 
@@ -29,14 +29,12 @@
 </template>
 
 <script>
-import Tree from "./Tree"
 import TreeMenu from "./TreeMenu"
 
 export default {
     name: "App",
 
     components: {
-        'tree': Tree,
         'tree-menu': TreeMenu
     },
 
@@ -69,11 +67,10 @@ export default {
     },
 
     methods: {
+        tagSize: function (counts) {
+            return { 'font-size': `${counts * 100}%` }
+        },
         filterSearch: function (search) {
-            function copy(o) {
-                return Object.assign({}, o)
-            }
-
             function f(o) {
                 var regex = new RegExp(search, "gi")
                 var isAvailable = false
@@ -82,11 +79,8 @@ export default {
                 if (o.title && isAvailable) { return true }
                 if (o.children) { return (o.children = o.children.filter(f)).length }
             }
-
             var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
-
             var res = [bookmarksCopy].filter(f)
-
             this.bookmarks = res[0]
         },
 
@@ -105,11 +99,8 @@ export default {
                 }
                 if (o.children) { return (o.children = o.children.filter(f)).length }
             }
-
             var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
-
             var res = [bookmarksCopy].filter(f)
-
             this.bookmarks = res[0]
         },
 
@@ -123,38 +114,34 @@ export default {
             var bookmarks = []
             var hashtags = []
 
+            //compute full tree
             var mapTags = o => {
                 var res = o
                 if (res.title) {
                     var foundTags = res.title.match(/#([^\s#]+)/gi)
                     if (foundTags && foundTags.length > -1) {
                         res.tags = foundTags
-                        console.log(res.tags)
                         hashtags.push(...foundTags)
                     }
                 }
                 if (res.children) { res.children = res.children.map(mapTags) }
                 return res
             }
-
             bookmarks = itemTree.map(mapTags)
 
             this.bookmarks = bookmarks[0]
             this.originalBookmarks = bookmarks[0]
 
+            //compute list of hashtags
             var hashtagCounts = {}
             for (var i = 0; i < hashtags.length; i++) {
                 hashtagCounts[hashtags[i]] = 1 + (hashtagCounts[hashtags[i]] || 0);
             }
             hashtagCounts = Object.keys(hashtagCounts).map(function(key) {
-              return {name: String(key), count: hashtagCounts[key]}
+                return {name: String(key), count: hashtagCounts[key]}
             });
 
             this.hashtags = hashtagCounts
-
-            // itemTree.forEach((item) => {
-            //     this.processNode(item);
-            // })
         })
     },
 

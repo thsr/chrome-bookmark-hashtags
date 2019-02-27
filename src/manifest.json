@@ -17,7 +17,8 @@
     ]
   },
   "permissions": [
-    "bookmarks"
+    "bookmarks",
+    "chrome://favicon/"
   ],
   "options_ui": {
     "page": "options/options.html",

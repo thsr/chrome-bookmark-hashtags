@@ -4,8 +4,8 @@
         <li class="label" @click="toggleChildren">
             <div :style="indent" :class="titleClasses">
                 <span v-if="node.children"><i class="fa" :class="iconClasses" aria-hidden="true"></i> </span>
-                <span v-else><i class="fa fa-file-o" aria-hidden="true"></i> </span>
-                {{ node.title }}
+                <span v-else><img :src="favicon"/> </span>
+                <span class="title">{{ node.title }}</span>
                 <span v-if="node.url"> <span class="url"><a :href="node.url" target="_blank"><!-- <i class="fa fa-external-link" aria-hidden="true"></i>  -->{{ node.url }}</a></span></span>
             </div>
         </li>
@@ -32,6 +32,17 @@ export default {
          }
     },
     computed: {
+        favicon() {
+            var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/g
+            var groups = regex.exec(this.node.url)
+            if (groups) {
+                return "chrome://favicon/" + groups[2] + "://" + groups[3]
+            } else {
+                return "chrome://favicon"
+            }
+
+        },
+
         iconClasses() {
             return {
                 'fa-folder': !this.showChildren && !this.expandAll,
@@ -66,20 +77,22 @@ ul.node {
 }
 
 .label {
+    vertical-align: middle;
 
     border-bottom: 1px solid #ccc;
     padding: 5px 0;
-
-    .url {
-        font-size:80%;
+    
+    .title, .url {
         display: inline-block;
-        vertical-align: bottom;
-        padding:0;
-        margin:0;
-        width: 450px;
+        vertical-align: middle;
+        max-width: 450px;
         white-space: nowrap; 
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .url {
+        font-size:80%;
     }
 
     .has-children {
