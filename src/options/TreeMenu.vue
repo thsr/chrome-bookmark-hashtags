@@ -1,14 +1,14 @@
 <template>
-  <div class="tree-menu">
+  <ul class="node">
 
-    <div class="title-wrapper" @click="toggleChildren">
+    <li class="label" @click="toggleChildren">
       <div :style="indent" :class="titleClasses">
-        <i v-if="node.children" class="fa" :class="iconClasses"></i>
-        <span v-if="node.children">+ </span>
+        <span v-if="node.children"><i class="fa" :class="iconClasses" aria-hidden="true"></i> </span>
+        <span v-else><i class="fa fa-file-o" aria-hidden="true"></i> </span>
         {{ node.title }}
-        <span v-if="node.url"> - <span class="url">{{ node.url }}</span></span>
+        <span v-if="node.url"> <span class="url"><a :href="node.url" target="_blank">{{ node.url }}</a></span></span>
       </div>
-    </div>
+    </li>
 
     <tree-menu 
       v-if="showChildren || expandAll"
@@ -18,7 +18,7 @@
       :expandAll="expandAll"
       ></tree-menu>
 
-  </div>
+  </ul>
 
 </template>
 
@@ -34,15 +34,15 @@ export default {
   computed: {
     iconClasses() {
       return {
-        'fa-plus-square-o': !this.showChildren,
-        'fa-minus-square-o': this.showChildren
+        'fa-folder': !this.showChildren && !this.expandAll,
+        'fa-folder-open': this.showChildren || this.expandAll
       }
     },
     titleClasses() {
       return { 'has-children': this.node.children }
     },
     indent() {
-      return { transform: `translate(${this.depth * 50}px)` }
+      return true//{ transform: `translate(${this.depth * 50}px)` }
     }
   },
   methods: {
@@ -61,20 +61,30 @@ export default {
   margin: 0 auto;
 }
 
-.url {
-  width: 150px;
-  white-space: nowrap; 
-  overflow: hidden;
-  text-overflow: ellipsis;
+ul.node {
+  list-style-type: none;
 }
 
-.tree-menu {
-  .title-wrapper {
-    border-bottom: 1px solid #ccc;
-    .has-children {
-      cursor: pointer;
-    }
+.label {
+
+  border-bottom: 1px solid #ccc;
+  padding: 5px 0;
+
+  .url {
+    display: inline-block;
+    vertical-align: bottom;
+    padding:0;
+    margin:0;
+    width: 450px;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .has-children {
+    cursor: pointer;
   }
 }
+
 
 </style>
