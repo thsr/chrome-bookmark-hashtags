@@ -1,0 +1,26 @@
+{
+  "name": "Chrome Bookmark Hashtags",
+  "description": "Add #hashtags to your Chrome bookmarks and manage them easily!",
+  "version": null,
+  "manifest_version": 2,
+  "icons": {
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  },
+  "browser_action": {
+    "default_title": "chrome ",
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "bookmarks"
+  ],
+  "options_ui": {
+    "page": "options/options.html",
+    "chrome_style": true
+  }
+}
