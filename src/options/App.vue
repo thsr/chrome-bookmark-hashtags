@@ -36,7 +36,7 @@
             <v-icon v-if="item.children">
               {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
             </v-icon>
-            <img :src="favicon(item.favicon)" v-else>
+            <img :src="item.favicon" v-else>
           </template>
 
 <!--           <template slot="label" slot-scope="{ item }">
@@ -170,7 +170,6 @@ export default {
             } else {
                 res = "chrome://favicon"
             }
-            console.log(res)
             return res
 
         },
@@ -178,7 +177,7 @@ export default {
         toggleExpandAll: function (node) {
             this.expandAll = !this.expandAll
             this.$refs.treeview.updateAll(this.expandAll)
-        }
+        },
 
         tagSize: function (counts) {
             return { 'font-size': `${counts * 100}%` }
