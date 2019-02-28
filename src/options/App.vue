@@ -1,26 +1,56 @@
 <template>
-  <div>
-   <div class="hashtag-cloud">
-        <div class="hashtag-list">
-           <div v-for="tag in hashtagsAlphabetical" :style="tagSize(tag.count)" :class="{ selected: tag.selected }" @click="selectHashtag(tag)">
-               <span>{{tag.name}}</span>
-           </div>
-       </div>
-   </div>
 
-    <div class="tools">
-        <button @click="loadBookmarks">Reload</button>
-        <button @click="toggleExpandAll">Expand All / Collapse All</button>
-    </div>
 
-    <div class="bookmarks">
-        <tree-menu 
-               :node="bookmarks" 
-               :depth="0"
-               :expandAll="expandAll"
-               ></tree-menu>
-    </div>
-  </div>
+
+
+  <v-app>
+    <v-card
+      class="mx-auto"
+      width="800">
+      <v-sheet class="pa-3 primary lighten-2">
+        <v-text-field
+          v-model="searchTerm"
+          label="Search"
+          dark
+          flat
+          solo-inverted
+          hide-details
+          clearable
+          clear-icon="mdi-close-circle-outline"></v-text-field>
+<!--         <v-checkbox
+          v-model="caseSensitive"
+          dark
+          hide-details
+          label="Case sensitive search"
+        ></v-checkbox> -->
+        <button @click="toggleExpandAll">expand all</button>
+      </v-sheet>
+      <v-card-text>
+        <v-treeview ref="treeview"
+          open-on-click
+          :items="bookmarks"
+          :search="searchTerm"
+          item-text="title">
+
+          <template slot="prepend" slot-scope="{ item, open }">
+            <v-icon v-if="item.children">
+              {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+            </v-icon>
+            <img :src="favicon(item.favicon)" v-else>
+          </template>
+
+<!--           <template slot="label" slot-scope="{ item }">
+            {{item.title}}
+          </template> -->
+
+        </v-treeview>
+      </v-card-text>
+    </v-card>
+  </v-app>
+
+
+
+
 </template>
 
 <script>
@@ -35,16 +65,21 @@ export default {
 
     data () {
         return {
-            bookmarks: {},
+            bookmarks: [],
             originalBookmarks: {},
-            expandAll: true,
+            expandAll: false,
             searchTerm: "",
             searchTermTags: "",
-            hashtags: []
+            hashtags: [],
         }
     },
 
     computed: {
+        filter () {
+          return this.caseSensitive
+            ? (item, search, textKey) => item.title.indexOf(search) > -1
+            : undefined
+        },
         hashtagsAlphabetical: function () {
             return this.hashtags.sort((a, b) => {
                   var nameA = a.name.toUpperCase(); // ignore upper and lowercase
@@ -65,7 +100,7 @@ export default {
             return this.hashtagsAlphabetical.filter((o) => {
                 return o.selected == true
             })
-        }
+        },
     },
 
     methods: {
@@ -73,28 +108,47 @@ export default {
         loadBookmarks: function () {
             chrome.bookmarks.getTree((itemTree) => {
                 var bookmarks = []
+
+                var mapTags = o => {
+                    if (o.title) {
+                        var foundTags = o.title.match(/#([^\s#]+)/gi)
+                        if (foundTags && foundTags.length > -1) {
+                            o.tags = foundTags
+                        }
+                    }
+                    if (o.children) { o.children = o.children.map(mapTags) }
+                    return o
+                }
+                var mapFavicons = o => {
+                    if (o.url) {
+                        o.favicon = this.favicon(o.url)
+                    }
+                    if (o.children) { o.children = o.children.map(mapFavicons) }
+                    return o
+                }
+                bookmarks = itemTree.map(mapTags).map(mapFavicons)
+
+                this.bookmarks = bookmarks
+                this.originalBookmarks = bookmarks[0]
+            })
+        },
+        
+        loadHashtags: function () {
+            chrome.bookmarks.getTree((itemTree) => {
                 var hashtags = []
 
-                //compute full tree
-                var mapTags = o => {
-                    var res = o
-                    if (res.title) {
-                        var foundTags = res.title.match(/#([^\s#]+)/gi)
+                var generateFoundTags = o => {
+                    if (o.title) {
+                        var foundTags = o.title.match(/#([^\s#]+)/gi)
                         if (foundTags && foundTags.length > -1) {
-                            res.tags = foundTags
                             hashtags.push(...foundTags)
                         }
                     }
-                    if (res.children) { res.children = res.children.map(mapTags) }
-                    return res
+                    if (o.children) { o.children = o.children.map(generateFoundTags) }
+                    return o
                 }
-                bookmarks = itemTree.map(mapTags)
+                itemTree.map(generateFoundTags)
 
-                this.bookmarks = bookmarks[0]
-                this.originalBookmarks = bookmarks[0]
-                console.log(bookmarks[0])
-
-                //compute list of hashtags
                 var hashtagCounts = {}
                 for (var i = 0; i < hashtags.length; i++) {
                     hashtagCounts[hashtags[i]] = 1 + (hashtagCounts[hashtags[i]] || 0);
@@ -106,7 +160,26 @@ export default {
                 this.hashtags = hashtagCounts
             })
         },
+
+        favicon: function(url) {
+            var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/g
+            var groups = regex.exec(url)
+            var res = ''
+            if (groups) {
+                res = "chrome://favicon/https://" + groups[3]
+            } else {
+                res = "chrome://favicon"
+            }
+            console.log(res)
+            return res
+
+        },
         
+        toggleExpandAll: function (node) {
+            this.expandAll = !this.expandAll
+            this.$refs.treeview.updateAll(this.expandAll)
+        }
+
         tagSize: function (counts) {
             return { 'font-size': `${counts * 100}%` }
         },
@@ -116,6 +189,7 @@ export default {
             var hashtagsSelectedToSearch = this.hashtagsSelected.map(o => o.name)
             this.filterSearchTags(hashtagsSelectedToSearch)
         },
+
         filterSearch: function (search) {
             if (search == "") {
                 var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
@@ -163,13 +237,11 @@ export default {
             this.bookmarks = res[0]
         },
 
-        toggleExpandAll: function (node) {
-            this.expandAll = !this.expandAll
-        }
     },
 
-    created: function () {
-        this.loadBookmarks();
+    beforeMount: function () {
+        this.loadBookmarks()
+        this.loadHashtags()
     },
 
 
@@ -177,6 +249,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+body {font-size:70%;}
+input {border-width:0 !important;}
 
 .hashtag-cloud {
     display: block;
