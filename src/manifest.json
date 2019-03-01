@@ -8,7 +8,7 @@
     "128": "icons/icon_128.png"
   },
   "browser_action": {
-    "default_title": "chrome ",
+    "default_title": "Chrome Bookmark Hashtags",
     "default_popup": "popup/popup.html"
   },
   "background": {

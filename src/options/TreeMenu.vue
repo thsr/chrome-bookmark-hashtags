@@ -1,23 +1,21 @@
 <template>
     <ul class="node">
 
-        <li class="label" @click="toggleChildren" :class="hasChildren">
+        <li class="node" @click="toggleChildren" :class="hasChildren">
 
             <span v-if="node.children">&nbsp;<i class="fa" :class="faFolderOpenClose" aria-hidden="true"></i>&nbsp; </span>
-            <span v-else><img class="favicon" :src="favicon"/> </span>
-            <span class="title">{{ node.title }}</span>
-            <span v-if="node.url"><br><span class="url"><a :href="node.url" target="_blank">{{ node.url }}</a></span></span>
+            <span v-else><img class="favicon" :src="node.favicon"/> </span>
+            <span class="name">{{ node.title }}</span>
+            <span v-if="node.url"><br><span class="text-truncate"><a :href="node.url" target="_blank">{{ node.url }}</a></span></span>
 
         </li>
-        <transition-group name="fade-slide-y" mode="in-out" appear>
-        <tree-menu 
-            :key="node.id"
+        <tree-menu
             v-if="showChildren || expandAll"
             v-for="child in node.children" 
             :node="child"
             :depth="depth + 1"
             :expandAll="expandAll"
-            ></tree-menu></transition-group>
+            ></tree-menu>
 
     </ul>
 
@@ -33,16 +31,6 @@ export default {
          }
     },
     computed: {
-        favicon() {
-            var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/g
-            var groups = regex.exec(this.node.url)
-            if (groups) {
-                return "chrome://favicon/https://" + groups[3]
-            } else {
-                return "chrome://favicon"
-            }
-
-        },
 
         faFolderOpenClose() {
             return {
@@ -65,22 +53,6 @@ export default {
 
 <style scoped lang="scss">
 
-
-.fade-slide-y-enter-active, .fade-slide-y-leave-active{
-    transition: all .2s;
-}
-
-.fade-slide-y-enter, .fade-slide-y-leave-to{
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-
-.container {
-    width: 300px;
-    margin: 0 auto;
-}
-
 ul.node {
     list-style-type: none;
 }
@@ -90,7 +62,7 @@ ul.node {
     background: #eee;
 }
 
-.label {
+li.node {
     vertical-align: middle;
 
     border-top: 1px solid #ccc;
@@ -98,10 +70,10 @@ ul.node {
     margin-bottom: -1px;
     padding: 5px;
     
-    .title, .url {
+    .name, .url {
         display: inline-block;
         vertical-align: middle;
-        max-width: 450px;
+        max-width: 500px;
         white-space: nowrap; 
         overflow: hidden;
         text-overflow: ellipsis;
