@@ -82,7 +82,8 @@
                 ===========================-->
                 <v-card-text>
                   <v-chip 
-                    v-for="tag in hashtagsAlphabetical" 
+                    v-for="tag in hashtagsAlphabetical"
+                    :key="tag.name"
                     :selected="tag.selected"
                     @click="selectHashtag(tag)"
                     >
@@ -334,9 +335,29 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-.hashtagsAlphabetical.selected {
-  color: red;
-}
+<style lang="styl">
+
+/*// set these variables before Vuetify does*/
+$body-font-family = Arial
+$alert-font-size = 18px
+/*Then, import _variables.styl so that you can override the nested values:*/
+
+@import '~vuetify/src/stylus/settings/_variables'
+
+/*// now that the $material-dark hash exists, set the background*/
+$material-dark.background = 'green'
+/*Then, import the main.styl so that the Vuetify CSS classes are created:*/
+
+/*// import main to set all styles*/
+@import '~vuetify/src/stylus/main'
+
+/*// override the CSS classes using stylus variables*/
+.display-2
+  font-size: $headings.h6.size !important
+  font-family: $headings.h3.font-family !important
+
+
+
+
 </style>
 
