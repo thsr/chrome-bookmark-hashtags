@@ -1,12 +1,7 @@
 <template>
 
-
-
-
   <v-app>
-    <v-card
-      class="mx-auto"
-      width="800">
+    <v-card>
       <v-sheet class="pa-3 primary lighten-2">
         <v-text-field
           v-model="searchTerm"
@@ -23,34 +18,27 @@
           hide-details
           label="Case sensitive search"
         ></v-checkbox> -->
-        <button @click="toggleExpandAll">expand all</button>
+        <v-btn @click="toggleExpandAll">expand all</v-btn>
       </v-sheet>
       <v-card-text>
-        <v-treeview ref="treeview"
-          open-on-click
-          :items="bookmarks"
-          :search="searchTerm"
-          item-text="title">
+   <div class="hashtag-cloud">
+      <v-chip v-for="tag in hashtagsAlphabetical" @click="selectHashtag(tag)">{{tag.name}}</v-chip>
+   </div>
 
-          <template slot="prepend" slot-scope="{ item, open }">
-            <v-icon v-if="item.children">
-              {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-            </v-icon>
-            <img :src="item.favicon" v-else>
-          </template>
+    <div class="tools">
+        <v-btn @click="loadBookmarks">Reload</v-btn>
+        <v-btn @click="toggleExpandAll">Expand All / Collapse All</v-btn>
+    </div>
 
-<!--           <template slot="label" slot-scope="{ item }">
-            {{item.title}}
-          </template> -->
+        <tree-menu 
+               :node="bookmarks" 
+               :depth="0"
+               :expandAll="expandAll"
+               ></tree-menu>
 
-        </v-treeview>
       </v-card-text>
     </v-card>
   </v-app>
-
-
-
-
 </template>
 
 <script>
@@ -65,21 +53,16 @@ export default {
 
     data () {
         return {
-            bookmarks: [],
+            bookmarks: {},
             originalBookmarks: {},
-            expandAll: false,
+            expandAll: true,
             searchTerm: "",
             searchTermTags: "",
-            hashtags: [],
+            hashtags: []
         }
     },
 
     computed: {
-        filter () {
-          return this.caseSensitive
-            ? (item, search, textKey) => item.title.indexOf(search) > -1
-            : undefined
-        },
         hashtagsAlphabetical: function () {
             return this.hashtags.sort((a, b) => {
                   var nameA = a.name.toUpperCase(); // ignore upper and lowercase
@@ -100,11 +83,10 @@ export default {
             return this.hashtagsAlphabetical.filter((o) => {
                 return o.selected == true
             })
-        },
+        }
     },
 
     methods: {
-        
         loadBookmarks: function () {
             chrome.bookmarks.getTree((itemTree) => {
                 var bookmarks = []
@@ -128,7 +110,7 @@ export default {
                 }
                 bookmarks = itemTree.map(mapTags).map(mapFavicons)
 
-                this.bookmarks = bookmarks
+                this.bookmarks = bookmarks[0]
                 this.originalBookmarks = bookmarks[0]
             })
         },
@@ -174,11 +156,6 @@ export default {
 
         },
         
-        toggleExpandAll: function (node) {
-            this.expandAll = !this.expandAll
-            this.$refs.treeview.updateAll(this.expandAll)
-        },
-
         tagSize: function (counts) {
             return { 'font-size': `${counts * 100}%` }
         },
@@ -188,7 +165,6 @@ export default {
             var hashtagsSelectedToSearch = this.hashtagsSelected.map(o => o.name)
             this.filterSearchTags(hashtagsSelectedToSearch)
         },
-
         filterSearch: function (search) {
             if (search == "") {
                 var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
@@ -236,6 +212,9 @@ export default {
             this.bookmarks = res[0]
         },
 
+        toggleExpandAll: function (node) {
+            this.expandAll = !this.expandAll
+        }
     },
 
     beforeMount: function () {
@@ -248,7 +227,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-input {border-width:0 !important;}
 
 .hashtag-cloud {
     display: block;
@@ -257,7 +235,6 @@ input {border-width:0 !important;}
     .hashtag-list {
         margin: 0 auto 0;
         padding: 0;
-        width: 800px;
 
         div {
             display: inline-block;
@@ -280,7 +257,7 @@ input {border-width:0 !important;}
 .tools, .bookmarks {
     margin: 40px auto 0;
     padding: 0;
-    width: 800px;
+    /* width: 800px;*/
 }
 
 .bookmarks {
