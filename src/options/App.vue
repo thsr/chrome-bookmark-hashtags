@@ -1,14 +1,12 @@
 <template>
-
-
-  <v-app>
+<v-app>
 
 
 
     <!--=========================
     =            nav            =
     ==========================-->
-    <v-navigation-drawer v-model="navigation.drawer" app clipped disable-resize-watcher class="grey lighten-4">
+<!--     <v-navigation-drawer v-model="navigation.drawer" app clipped disable-resize-watcher class="grey lighten-4">
       <v-list dense class="grey lighten-4">
         <template v-for="(item, i) in navigation.menu.items">
 
@@ -38,25 +36,33 @@
 
         </template>
       </v-list>
-    </v-navigation-drawer>
+    </v-navigation-drawer> -->
 
 
 
     <!--=============================
     =            toolbar            =
     ==============================-->
-    <v-toolbar color="amber" app  clipped-left>
-      <v-toolbar-side-icon @click="navigation.drawer = !navigation.drawer"></v-toolbar-side-icon>
+    <v-toolbar color="yellow" app clipped-left>
+      <!-- <v-toolbar-side-icon @click="navigation.drawer = !navigation.drawer"></v-toolbar-side-icon> -->
       <span class="title ml-3 mr-5">-&nbsp;<span class="font-weight-light">-</span></span>
+
+      <v-spacer></v-spacer>
+
       <v-text-field
         solo-inverted
         flat
         hide-details
         label="Search"
         prepend-inner-icon="search"
-      ></v-text-field>
+        ></v-text-field>
+
       <v-spacer></v-spacer>
+
+      <v-btn @click="toggleExpandAll">expand all</v-btn>
     </v-toolbar>
+
+
 
 
     <!--=============================
@@ -71,28 +77,17 @@
 
 
 
-                <!--==========================
+                <!--==========================:style="tagSize(tag.count)" style="margin-right:.5em;"
                 =            tags            =
                 ===========================-->
                 <v-card-text>
-                  <div 
-                    v-for="tag in hashtagsAlphabetical"
-                    :style="tagSize(tag.count)"
-                    class="hashtagsAlphabetical"
-                    :class="{ selected: tag.selected }"
+                  <v-chip 
+                    v-for="tag in hashtagsAlphabetical" 
+                    :selected="tag.selected"
                     @click="selectHashtag(tag)"
                     >
-                    <span>{{tag.name}}</span>
-                  </div>
-                </v-card-text>
-
-                <v-divider dark class="my-3"></v-divider>
-
-                <!--=============================
-                =            buttons            =
-                ==============================-->
-                <v-card-text>
-                  <button @click="toggleExpandAll">expand all</button>
+                    {{tag.name}}
+                  </v-chip>
                 </v-card-text>
 
                 <v-divider dark class="my-3"></v-divider>
@@ -103,7 +98,7 @@
                 <v-card-text>
                   <v-treeview ref="treeview"
                     open-on-click
-                    :items="bookmarks"
+                    :items="bookmarks.list"
                     item-text="title">
 
                     <template slot="prepend" slot-scope="{ item, open }">
@@ -131,15 +126,6 @@
 
 
 </v-app>
-
-
-
-
-
-
-
-
-
 </template>
 
 <script>
@@ -154,6 +140,16 @@ export default {
 
   data () {
     return {
+      bookmarks: {
+        expandAll: true,
+        list: [],
+        original: [],
+      },
+      hashtags: {
+        list:[],
+      },
+      searchTerm: "",
+      searchTermTags: "",
       navigation: {
         drawer: null,
         menu: {
@@ -175,18 +171,12 @@ export default {
           ],
         }
       },
-      bookmarks: [],
-      originalBookmarks: [],
-      expandAll: false,
-      searchTerm: "",
-      searchTermTags: "",
-      hashtags: [],
     }
   },
 
   computed: {
     hashtagsAlphabetical: function() {
-      return this.hashtags.sort((a, b) => {
+      return this.hashtags.list.sort((a, b) => {
         var nameA = a.name.toUpperCase()
         var nameB = b.name.toUpperCase()
         if (nameA < nameB) {
@@ -196,7 +186,6 @@ export default {
         }
         return 0
       })
-      
     },
 
     hashtagsSelected: function() {
@@ -204,7 +193,6 @@ export default {
         return o.selected == true
       })
     },
-
   },
 
   methods: {
@@ -230,8 +218,8 @@ export default {
           return o
         }
         bookmarks = itemTree.map(mapTags).map(mapFavicons)
-        this.bookmarks = bookmarks
-        this.originalBookmarks = bookmarks
+        this.bookmarks.list = bookmarks
+        this.bookmarks.original = bookmarks
       })
     },
     
@@ -257,9 +245,8 @@ export default {
         }
         hashtagCounts = Object.keys(hashtagCounts).map(function(key) {
           return {name: String(key), count: hashtagCounts[key], selected: false}
-        });
-        console.log(hashtagCounts)
-        this.hashtags = hashtagCounts
+        })
+        this.hashtags.list = hashtagCounts
       })
     },
 
@@ -276,8 +263,8 @@ export default {
     },
     
     toggleExpandAll: function(node) {
-      this.expandAll = !this.expandAll
-      this.$refs.treeview.updateAll(this.expandAll)
+      this.bookmarks.expandAll = !this.bookmarks.expandAll
+      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
     },
 
     tagSize: function(counts) {
@@ -292,8 +279,8 @@ export default {
 
     filterSearch: function(search) {
       if (search == "") {
-        var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
-        this.bookmarks = bookmarksCopy
+        var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
+        this.bookmarks.list = bookmarksCopy
         return
       }
       function f(o) {
@@ -304,15 +291,15 @@ export default {
         if (o.title && isAvailable) { return true }
         if (o.children) { return (o.children = o.children.filter(f)).length }
       }
-      var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
+      var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
       var res = [bookmarksCopy].filter(f)
-      this.bookmarks = res[0]
+      this.bookmarks.list = res[0]
     },
 
     searchByHashtag: function(searchArr) {
       if (searchArr.length == 0) {
-        var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
-        this.bookmarks = bookmarksCopy
+        var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
+        this.bookmarks.list = bookmarksCopy
         return
       }
 
@@ -329,10 +316,10 @@ export default {
         if (o.children) { return (o.children = o.children.filter(f)).length }
       }
 
-      var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
+      var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
       var res = bookmarksCopy.filter(f)
 
-      this.bookmarks = res
+      this.bookmarks.list = res
       this.$refs.treeview.updateAll(true)
     },
 
