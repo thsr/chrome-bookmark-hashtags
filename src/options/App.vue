@@ -8,7 +8,7 @@
     <!--=========================
     =            nav            =
     ==========================-->
-    <v-navigation-drawer v-model="navigation.drawer" app clipped  class="grey lighten-4">
+    <v-navigation-drawer v-model="navigation.drawer" app clipped disable-resize-watcher class="grey lighten-4">
       <v-list dense class="grey lighten-4">
         <template v-for="(item, i) in navigation.menu.items">
 
@@ -230,7 +230,6 @@ export default {
           return o
         }
         bookmarks = itemTree.map(mapTags).map(mapFavicons)
-        console.log(bookmarks)
         this.bookmarks = bookmarks
         this.originalBookmarks = bookmarks
       })
@@ -311,7 +310,6 @@ export default {
     },
 
     searchByHashtag: function(searchArr) {
-      console.log(searchArr)
       if (searchArr.length == 0) {
         var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
         this.bookmarks = bookmarksCopy
@@ -323,7 +321,6 @@ export default {
         var regex = new RegExp(searchArr.join("|"), "i")
         var isAvailable = false
         if (o.tags) {
-          console.log(o.tags)
           o.tags.map( (t) => {
             isAvailable = isAvailable || regex.test(t)
           })
@@ -333,9 +330,7 @@ export default {
       }
 
       var bookmarksCopy = JSON.parse(JSON.stringify(this.originalBookmarks))
-      var res = [bookmarksCopy].filter(f)
-
-      console.log(res)
+      var res = bookmarksCopy.filter(f)
 
       this.bookmarks = res
       this.$refs.treeview.updateAll(true)
