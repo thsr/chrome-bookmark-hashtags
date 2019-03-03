@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "vue": "^2.5.17",
+    "vue-progressbar": "^0.7.5",
     "vuetify": "^1.5.3",
     "webextension-polyfill": "^0.3.1"
   },

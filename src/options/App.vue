@@ -1,6 +1,6 @@
 <template>
 <v-app>
-
+<vue-progress-bar></vue-progress-bar>
 
 
     <!--=========================
@@ -43,23 +43,26 @@
     <!--=============================
     =            toolbar            =
     ==============================-->
-    <v-toolbar color="yellow" app clipped-left>
+    <v-toolbar color="primary" dark app clipped-left>
       <!-- <v-toolbar-side-icon @click="navigation.drawer = !navigation.drawer"></v-toolbar-side-icon> -->
       <span class="title ml-3 mr-5">-&nbsp;<span class="font-weight-light">-</span></span>
 
       <v-spacer></v-spacer>
 
+
       <v-text-field
+        @keyup.enter="searchByTitle(searchTerm)"
+        v-model="searchTerm"
+        @click:clear="searchByTitle('')"
+        clearable
         solo-inverted
         flat
         hide-details
-        label="Search"
+        label="Search bookmark title"
         prepend-inner-icon="search"
         ></v-text-field>
 
       <v-spacer></v-spacer>
-
-      <v-btn @click="toggleExpandAll">expand all</v-btn>
     </v-toolbar>
 
 
@@ -69,10 +72,35 @@
     =            content            =
     ==============================-->
     <v-content fixed>
-      <v-container fluid fill-height>
+      <v-container>
         <v-layout justify-center>
           <v-flex>
             <v-card>
+
+
+
+
+
+                <!--=====================================
+                =            bookmarks tools            =
+                =======================================-->
+                <v-toolbar dense flat>
+                  <v-btn flat @click="toggleExpandAll" style="width:170px;">
+                    {{expandAllText}}
+                    <v-icon right v-if="bookmarks.expandAll">expand_less</v-icon>
+                    <v-icon right v-else>expand_more</v-icon>
+                  </v-btn>
+
+                  <v-divider vertical></v-divider>
+
+                  <v-btn flat @click="refresh" style="width:170px;">
+                    Refresh
+                    <v-icon right>refresh</v-icon>
+                  </v-btn>
+                </v-toolbar>
+
+
+
 
 
 
@@ -91,7 +119,11 @@
                   </v-chip>
                 </v-card-text>
 
-                <v-divider dark class="my-3"></v-divider>
+
+
+
+
+
 
                 <!--==============================
                 =            treeview            =
@@ -106,12 +138,16 @@
                       <v-icon v-if="item.children">
                         {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                       </v-icon>
-                      <img :src="item.favicon" v-else>
+                      <a :href="item.url" target="_blank" v-else><img :src="item.favicon"></a>
                     </template>
 
-            <!--           <template slot="label" slot-scope="{ item }">
-                      {{item.title}}
-                    </template> -->
+                    <template slot="label" slot-scope="{ item }" >
+                      <!-- <span @click="item.url ? openInNewWindow(item.url) : null"> -->
+                        <a v-if="item.url" :href="item.url" target="_blank" class="">{{item.title}}</a>
+                        <span v-else>{{item.title}}</span>
+                        <a :href="item.url" target="_blank" class="body-2 font-weight-light">{{item.url}}</a>
+                      <!--  -->
+                    </template>
 
                   </v-treeview>
                 </v-card-text>
@@ -130,19 +166,19 @@
 </template>
 
 <script>
-import TreeMenu from "./TreeMenu"
+// import TreeMenu from "./TreeMenu"
 
 export default {
   name: "App",
 
-  components: {
-    'tree-menu': TreeMenu
-  },
+  // components: {
+  //   'tree-menu': TreeMenu
+  // },
 
   data () {
     return {
       bookmarks: {
-        expandAll: true,
+        expandAll: false,
         list: [],
         original: [],
       },
@@ -194,10 +230,16 @@ export default {
         return o.selected == true
       })
     },
+
+    expandAllText: function() {
+      return this.bookmarks.expandAll ? "Collapse All" : "Expand All"
+      // return "Show All"
+    },
   },
 
   methods: {
     loadBookmarks: function() {
+        this.$Progress.start()
       chrome.bookmarks.getTree((itemTree) => {
         var bookmarks = []
 
@@ -221,6 +263,7 @@ export default {
         bookmarks = itemTree.map(mapTags).map(mapFavicons)
         this.bookmarks.list = bookmarks
         this.bookmarks.original = bookmarks
+        this.$Progress.finish()
       })
     },
     
@@ -267,9 +310,18 @@ export default {
       this.bookmarks.expandAll = !this.bookmarks.expandAll
       this.$refs.treeview.updateAll(this.bookmarks.expandAll)
     },
+    
+    refresh: function(node) {
+      this.loadHashtags()
+      this.loadBookmarks()
+    },
 
     tagSize: function(counts) {
       return { 'font-size': `${counts * 100}%` }
+    },
+
+    openInNewWindow: function(url) {   
+        window.open(url, "_blank");    
     },
 
     selectHashtag: function(tag) {
@@ -278,12 +330,8 @@ export default {
       this.searchByHashtag(hashtagsSelectedToSearch)
     },
 
-    filterSearch: function(search) {
-      if (search == "") {
-        var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
-        this.bookmarks.list = bookmarksCopy
-        return
-      }
+    searchByTitle: function(search) {
+      this.$Progress.start()
       function f(o) {
         var regex = new RegExp(search, "gi")
         var isAvailable = false
@@ -292,18 +340,23 @@ export default {
         if (o.title && isAvailable) { return true }
         if (o.children) { return (o.children = o.children.filter(f)).length }
       }
+
       var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
-      var res = [bookmarksCopy].filter(f)
-      this.bookmarks.list = res[0]
+
+      if (search.length == "") {
+        var res = bookmarksCopy
+      } else {
+        var res = bookmarksCopy.filter(f)
+      }
+
+      this.bookmarks.list = res
+      this.bookmarks.expandAll = true
+      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+      this.$Progress.finish()
     },
 
     searchByHashtag: function(searchArr) {
-      if (searchArr.length == 0) {
-        var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
-        this.bookmarks.list = bookmarksCopy
-        return
-      }
-
+      this.$Progress.start()
       function f(o) {
         searchArr = searchArr.map(o => "^" + o + "$")
         var regex = new RegExp(searchArr.join("|"), "i")
@@ -314,14 +367,23 @@ export default {
           })
           return isAvailable
         }
-        if (o.children) { return (o.children = o.children.filter(f)).length }
+        if (o.children) {
+          return (o.children = o.children.filter(f)).length
+        }
       }
 
       var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
-      var res = bookmarksCopy.filter(f)
+
+      if (searchArr.length == 0) {
+        var res = bookmarksCopy
+      } else {
+        var res = bookmarksCopy.filter(f)
+      }
 
       this.bookmarks.list = res
-      this.$refs.treeview.updateAll(true)
+      this.bookmarks.expandAll = true
+      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+      this.$Progress.finish()
     },
 
   },
@@ -331,33 +393,34 @@ export default {
     this.loadHashtags()
   },
 
+  mounted: function () {
+  },
+
 
 }
 </script>
 
-<style lang="styl">
+<style lang="scss">
+.__cov-progress {
+  opacity: 1;
+  z-index: 999999;
+}
+body {
+font-size:80% !important;
+}
+.v-treeview-node {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
-/*// set these variables before Vuetify does*/
-$body-font-family = Arial
-$alert-font-size = 18px
-/*Then, import _variables.styl so that you can override the nested values:*/
+/*.v-treeview-node--leaf>.v-treeview-node__root,
+.v-treeview-node--leaf>.v-treeview-node__root>.v-treeview-node__content>*:not(.cursor-pointer):not(a) {
+  cursor: default !important;
+}
 
-@import '~vuetify/src/stylus/settings/_variables'
-
-/*// now that the $material-dark hash exists, set the background*/
-$material-dark.background = 'green'
-/*Then, import the main.styl so that the Vuetify CSS classes are created:*/
-
-/*// import main to set all styles*/
-@import '~vuetify/src/stylus/main'
-
-/*// override the CSS classes using stylus variables*/
-.display-2
-  font-size: $headings.h6.size !important
-  font-family: $headings.h3.font-family !important
-
-
-
-
+.cursor-pointer {
+  cursor: pointer !important;
+}*/
 </style>
 

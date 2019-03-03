@@ -8,17 +8,16 @@
     "128": "icons/icon_128.png"
   },
   "browser_action": {
-    "default_title": "Chrome Bookmark Hashtags",
-    "default_popup": "popup/popup.html"
+    "default_title": "Chrome Bookmark Hashtags"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["background.js"],
+     "persistent": false
   },
   "permissions": [
     "bookmarks",
-    "chrome://favicon/"
+    "chrome://favicon/",
+    "tabs"
   ],
   "options_ui": {
     "page": "options/options.html"
