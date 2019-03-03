@@ -45,10 +45,11 @@
     ==============================-->
     <v-toolbar color="primary" dark app clipped-left>
       <!-- <v-toolbar-side-icon @click="navigation.drawer = !navigation.drawer"></v-toolbar-side-icon> -->
-      <span class="title ml-3 mr-5">-&nbsp;<span class="font-weight-light">-</span></span>
+      <span class="title ml-3 mr-5">Hashtags&nbsp;<span class="font-weight-light">for Chrome bookmarks</span></span>
+
+
 
       <v-spacer></v-spacer>
-
 
       <v-text-field
         @keyup.enter="searchByTitle(searchTerm)"
@@ -63,6 +64,36 @@
         ></v-text-field>
 
       <v-spacer></v-spacer>
+      
+        <v-btn flat>
+          View by folder
+        </v-btn>
+      
+        <v-btn flat>
+          View by date added
+        </v-btn>
+      
+
+      <v-dialog
+        v-model="dialog.about"
+        width="500"
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            icon
+            v-on="on"
+          >
+            <v-icon>info</v-icon>
+          </v-btn>
+        </template>
+  
+        <v-card>
+          <v-card-text>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
     </v-toolbar>
 
 
@@ -85,17 +116,20 @@
                 =            bookmarks tools            =
                 =======================================-->
                 <v-toolbar dense flat>
-                  <v-btn flat @click="toggleExpandAll" style="width:170px;">
-                    {{expandAllText}}
-                    <v-icon right v-if="bookmarks.expandAll">expand_less</v-icon>
-                    <v-icon right v-else>expand_more</v-icon>
+
+                  <v-btn flat @click="refresh">
+                    Refresh
+                    <v-icon right>refresh</v-icon>
                   </v-btn>
 
                   <v-divider vertical></v-divider>
 
-                  <v-btn flat @click="refresh" style="width:170px;">
-                    Refresh
-                    <v-icon right>refresh</v-icon>
+                  <v-btn flat @click="doExpandAll">
+                    Expand All
+                  </v-btn>
+
+                  <v-btn flat @click="doCollapseAll">
+                    Collapse All
                   </v-btn>
                 </v-toolbar>
 
@@ -208,6 +242,9 @@ export default {
           ],
         }
       },
+      dialog: {
+        about: false
+      },
     }
   },
 
@@ -311,6 +348,16 @@ export default {
       this.$refs.treeview.updateAll(this.bookmarks.expandAll)
     },
     
+    doExpandAll: function(node) {
+      this.bookmarks.expandAll = true
+      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+    },
+    
+    doCollapseAll: function(node) {
+      this.bookmarks.expandAll = false
+      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+    },
+    
     refresh: function(node) {
       this.loadHashtags()
       this.loadBookmarks()
@@ -405,13 +452,15 @@ export default {
   opacity: 1;
   z-index: 999999;
 }
-body {
-font-size:80% !important;
-}
+
 .v-treeview-node {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.v-card {
+  border-radius: .7em;
 }
 
 /*.v-treeview-node--leaf>.v-treeview-node__root,
