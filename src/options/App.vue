@@ -374,7 +374,7 @@ export default {
       var minCount = Math.min(...allCounts)
       var maxCount = Math.max(...allCounts)
       var res = ''
-      if      (count < ((maxCount - minCount) * 1 / 5) + minCount) {res = ''}
+      if (count < ((maxCount - minCount) * 1 / 5) + minCount) {res = ''}
       else if (count < ((maxCount - minCount) * 2 / 5) + minCount) {res = 'subheading'}
       else if (count < ((maxCount - minCount) * 3 / 5) + minCount) {res = 'title'}
       else if (count < ((maxCount - minCount) * 4 / 5) + minCount) {res = 'headline'}
@@ -388,8 +388,15 @@ export default {
       this.searchByHashtagAlt(hashtagsSelectedToSearch)
     },
 
+    deselectAllHashtags: function() {
+      this.hashtags.list.map(o => o.selected = false)
+    },
+
     searchByTitle: function(search) {
       this.$Progress.start()
+
+      this.deselectAllHashtags()
+
       function f(o) {
         var regex = new RegExp(search, "gi")
         var isAvailable = false
@@ -447,6 +454,8 @@ export default {
 
     searchByHashtagAlt: function(searchArr) {
       this.$Progress.start()
+
+      this.searchTerm = ''
 
       function filterData(data, reg) {
         var res = data.filter(function(o) {
