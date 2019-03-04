@@ -8,13 +8,13 @@
     =            toolbar            =
     ==============================-->
     <v-toolbar color="primary" dark app clipped-left>
-      <!-- <v-toolbar-side-icon @click="navigation.drawer = !navigation.drawer"></v-toolbar-side-icon> -->
-      <span class="title ml-3 mr-5">Hashtags&nbsp;<span class="font-weight-light">for Chrome bookmarks</span></span>
-
-
+      <span class="title ml-3 mr-5">Hashtags&nbsp;<span class="font-weight-light">for Chrome&nbsp;bookmarks</span></span>
 
       <v-spacer></v-spacer>
 
+      <!--================================
+      =            search bar            =
+      =================================-->
       <v-text-field
         @keyup.enter="searchByTitle(searchTerm)"
         v-model="searchTerm"
@@ -38,15 +38,17 @@
         </v-btn>
       
 
+      <!--==================================
+      =            about dialog            =
+      ===================================-->
       <v-dialog
         v-model="dialog.about"
         width="500"
-      >
+        class="body-1">
         <template v-slot:activator="{ on }">
           <v-btn
             icon
-            v-on="on"
-          >
+            v-on="on">
             <v-icon>info</v-icon>
           </v-btn>
         </template>
@@ -75,7 +77,6 @@
 
 
 
-
                 <!--=====================================
                 =            bookmarks tools            =
                 =======================================-->
@@ -96,9 +97,6 @@
                     Collapse All
                   </v-btn>
                 </v-toolbar>
-
-
-
 
 
 
@@ -185,25 +183,6 @@ export default {
       searchTermTags: "",
 
       navigation: {
-        menu: {
-          drawer: null,
-          items: [
-            { icon: 'lightbulb_outline', text: 'Notes' },
-            { icon: 'touch_app', text: 'Reminders' },
-            { divider: true },
-            { heading: 'Labels' },
-            { icon: 'add', text: 'Create new label' },
-            { divider: true },
-            { icon: 'archive', text: 'Archive' },
-            { icon: 'delete', text: 'Trash' },
-            { divider: true },
-            { icon: 'settings', text: 'Settings' },
-            { icon: 'chat_bubble', text: 'Trash' },
-            { icon: 'help', text: 'Help' },
-            { icon: 'phonelink', text: 'App downloads' },
-            { icon: 'keyboard', text: 'Keyboard shortcuts' }
-          ],
-        }
       },
       dialog: {
         about: false
