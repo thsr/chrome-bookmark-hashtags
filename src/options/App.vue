@@ -447,21 +447,39 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.__cov-progress {
-  opacity: 1;
-  z-index: 999999;
-}
+<style lang="styl">
+@import url('https://fonts.googleapis.com/css?family=Open+Sans')
 
-.v-treeview-node {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+@import '~vuetify/src/stylus/settings/_theme'
 
-.v-card {
-  border-radius: .7em;
-}
+// set these variables before Vuetify does
+$body-font-family = Roboto
+
+@import '~vuetify/src/stylus/settings/_variables'
+
+// now that the $material-dark hash exists, set the background
+// $material-dark.background = 'green'
+
+// import main to set all styles
+@import '~vuetify/src/stylus/main'
+
+// override the CSS classes using stylus variables
+.display-2
+  font-size: $headings.h6.size !important
+  font-family: $headings.h3.font-family !important
+
+.__cov-progress
+  opacity: 1
+  z-index: 999999
+
+.v-treeview-node
+  overflow: hidden
+  white-space: nowrap
+  text-overflow: ellipsis
+
+.v-card
+  border-radius: .7em
+
 
 /*.v-treeview-node--leaf>.v-treeview-node__root,
 .v-treeview-node--leaf>.v-treeview-node__root>.v-treeview-node__content>*:not(.cursor-pointer):not(a) {
