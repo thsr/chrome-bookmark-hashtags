@@ -108,11 +108,10 @@
                   <v-chip 
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
-                    :class="tagSize(tag.count)"
                     :selected="tag.selected"
                     @click="selectHashtag(tag)"
                     >
-                    {{tag.name}}
+                    <span :class="tagSize(tag.count)">{{tag.name}}</span> <span class="caption">&nbsp;({{tag.count}})</span>
                   </v-chip>
                 </v-card-text>
 
@@ -329,6 +328,7 @@ export default {
       tag.selected = !tag.selected
       var hashtagsSelectedToSearch = this.hashtagsSelected.map(o => o.name)
       this.searchByHashtagAlt(hashtagsSelectedToSearch)
+      
     },
 
     deselectAllHashtags: function() {
@@ -337,7 +337,6 @@ export default {
 
     searchByTitle: function(search) {
       this.$Progress.start()
-
       this.deselectAllHashtags()
 
       function f(o) {
@@ -359,45 +358,48 @@ export default {
 
       this.bookmarks.list = res
       this.bookmarks.expandAll = true
-      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
-      this.$Progress.finish()
+      setTimeout( () => {
+        this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+        this.$Progress.finish()
+      }, 30)
     },
 
-    searchByHashtag: function(searchArr) {
-      this.$Progress.start()
+    // searchByHashtag: function(searchArr) {
+    //   this.$Progress.start()
       
-      function f(o) {
-        searchArr = searchArr.map(o => "^" + o + "$")
-        var regex = new RegExp(searchArr.join("|"), "i")
-        var isAvailable = false
-        if (o.tags) {
-          o.tags.map( (t) => {
-            isAvailable = isAvailable || regex.test(t)
-          })
-          return isAvailable
-        }
-        if (o.children) {
-          return (o.children = o.children.filter(f))
-        }
-      }
+    //   function f(o) {
+    //     searchArr = searchArr.map(o => "^" + o + "$")
+    //     var regex = new RegExp(searchArr.join("|"), "i")
+    //     var isAvailable = false
+    //     if (o.tags) {
+    //       o.tags.map( (t) => {
+    //         isAvailable = isAvailable || regex.test(t)
+    //       })
+    //       return isAvailable
+    //     }
+    //     if (o.children) {
+    //       return (o.children = o.children.filter(f))
+    //     }
+    //   }
 
-      var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
+    //   var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
 
-      if (searchArr.length == 0) {
-        var res = bookmarksCopy
-      } else {
-        var res = bookmarksCopy.filter(f)
-      }
+    //   if (searchArr.length == 0) {
+    //     var res = bookmarksCopy
+    //   } else {
+    //     var res = bookmarksCopy.filter(f)
+    //   }
 
-      this.bookmarks.list = res
-      this.bookmarks.expandAll = true
-      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
-      this.$Progress.finish()
-    },
+    //   this.bookmarks.list = res
+    //   this.bookmarks.expandAll = true
+    //   setTimeout( () => {
+    //     this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+    //     this.$Progress.finish()
+    //   }, 30)
+    // },
 
     searchByHashtagAlt: function(searchArr) {
       this.$Progress.start()
-
       this.searchTerm = ''
 
       function filterData(data, reg) {
@@ -424,8 +426,11 @@ export default {
       }
 
       this.bookmarks.list = res
-      this.$refs.treeview.updateAll(true)
-      this.$Progress.finish()
+      this.bookmarks.expandAll = true
+      setTimeout( () => {
+        this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+        this.$Progress.finish()
+      }, 30)
     },
 
   },
