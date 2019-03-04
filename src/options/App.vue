@@ -201,6 +201,7 @@
 
 <script>
 // import TreeMenu from "./TreeMenu"
+// import { pick } from 'lodash'
 
 export default {
   name: "App",
@@ -276,7 +277,7 @@ export default {
 
   methods: {
     loadBookmarks: function() {
-        this.$Progress.start()
+      this.$Progress.start()
       chrome.bookmarks.getTree((itemTree) => {
         var bookmarks = []
 
@@ -297,7 +298,14 @@ export default {
           if (o.children) { o.children = o.children.map(mapFavicons) }
           return o
         }
-        bookmarks = itemTree.map(mapTags).map(mapFavicons)
+        // var mapPick = o => {
+        //   if (o.children) { o.children = o.children.map(mapPick) }
+        //   var res = pick(o, ['id', 'title', 'url', 'children', 'dateAdded', 'tags', 'favicon'])
+        //   res = JSON.parse(JSON.stringify(res))
+        //   return res
+        // }
+
+        bookmarks = itemTree.map(mapTags).map(mapFavicons)   //.map(mapPick)
         this.bookmarks.list = bookmarks
         this.bookmarks.original = bookmarks
         this.$Progress.finish()
@@ -374,7 +382,7 @@ export default {
     selectHashtag: function(tag) {
       tag.selected = !tag.selected
       var hashtagsSelectedToSearch = this.hashtagsSelected.map(o => o.name)
-      this.searchByHashtag(hashtagsSelectedToSearch)
+      this.searchByHashtagAlt(hashtagsSelectedToSearch)
     },
 
     searchByTitle: function(search) {
@@ -404,6 +412,7 @@ export default {
 
     searchByHashtag: function(searchArr) {
       this.$Progress.start()
+      
       function f(o) {
         searchArr = searchArr.map(o => "^" + o + "$")
         var regex = new RegExp(searchArr.join("|"), "i")
@@ -415,7 +424,7 @@ export default {
           return isAvailable
         }
         if (o.children) {
-          return (o.children = o.children.filter(f)).length
+          return (o.children = o.children.filter(f))
         }
       }
 
@@ -430,6 +439,38 @@ export default {
       this.bookmarks.list = res
       this.bookmarks.expandAll = true
       this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+      this.$Progress.finish()
+    },
+
+    searchByHashtagAlt: function(searchArr) {
+      this.$Progress.start()
+
+      function filterData(data, reg) {
+        var res = data.filter(function(o) {
+          if (o.children) {
+            o.children = filterData(o.children, reg)
+            return o.children.length + 1 - 1
+          }
+          if (o.tags) {
+            return o.tags.some( (e) => {return reg.test(e)})
+          }
+        })
+        return res;
+      }
+
+      var bookmarksCopy = JSON.parse(JSON.stringify(this.bookmarks.original))
+
+      if (searchArr.length == 0) {
+        var res = bookmarksCopy
+      } else {
+        searchArr = searchArr.map(o => "^" + o + "$")
+        var regex = new RegExp(searchArr.join("|"), "i")
+        var res = filterData(bookmarksCopy, regex)
+      }
+
+      this.bookmarks.list = res
+      console.log(res)
+      this.$refs.treeview.updateAll(true)
       this.$Progress.finish()
     },
 
