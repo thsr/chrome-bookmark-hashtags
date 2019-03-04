@@ -146,14 +146,13 @@
                   <v-chip 
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
+                    :class="tagSize(tag.count)"
                     :selected="tag.selected"
                     @click="selectHashtag(tag)"
                     >
                     {{tag.name}}
                   </v-chip>
                 </v-card-text>
-
-
 
 
 
@@ -176,11 +175,9 @@
                     </template>
 
                     <template slot="label" slot-scope="{ item }" >
-                      <!-- <span @click="item.url ? openInNewWindow(item.url) : null"> -->
                         <a v-if="item.url" :href="item.url" target="_blank" class="">{{item.title}}</a>
                         <span v-else>{{item.title}}</span>
                         <a :href="item.url" target="_blank" class="body-2 font-weight-light">{{item.url}}</a>
-                      <!--  -->
                     </template>
 
                   </v-treeview>
@@ -222,9 +219,10 @@ export default {
       },
       searchTerm: "",
       searchTermTags: "",
+
       navigation: {
-        drawer: null,
         menu: {
+          drawer: null,
           items: [
             { icon: 'lightbulb_outline', text: 'Notes' },
             { icon: 'touch_app', text: 'Reminders' },
@@ -316,7 +314,7 @@ export default {
       chrome.bookmarks.getTree((itemTree) => {
         var hashtags = []
 
-        var generateFoundTags = o => {
+        function generateFoundTags(o) {
           if (o.title) {
             var foundTags = o.title.match(/#([^\s#]+)/gi)
             if (foundTags && foundTags.length > -1) {
@@ -371,12 +369,17 @@ export default {
       this.loadBookmarks()
     },
 
-    tagSize: function(counts) {
-      return { 'font-size': `${counts * 100}%` }
-    },
-
-    openInNewWindow: function(url) {   
-        window.open(url, "_blank");    
+    tagSize: function(count) {
+      var allCounts = this.hashtags.list.map(o => o.count)
+      var minCount = Math.min(...allCounts)
+      var maxCount = Math.max(...allCounts)
+      var res = ''
+      if      (count < ((maxCount - minCount) * 1 / 5) + minCount) {res = ''}
+      else if (count < ((maxCount - minCount) * 2 / 5) + minCount) {res = 'subheading'}
+      else if (count < ((maxCount - minCount) * 3 / 5) + minCount) {res = 'title'}
+      else if (count < ((maxCount - minCount) * 4 / 5) + minCount) {res = 'headline'}
+      else {res = 'display-1'}
+      return res
     },
 
     selectHashtag: function(tag) {
@@ -469,7 +472,6 @@ export default {
       }
 
       this.bookmarks.list = res
-      console.log(res)
       this.$refs.treeview.updateAll(true)
       this.$Progress.finish()
     },
