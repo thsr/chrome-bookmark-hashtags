@@ -101,14 +101,14 @@
 
 
 
-                <!--==========================:style="tagSize(tag.count)" style="margin-right:.5em;"
+                <!--==========================
                 =            tags            =
                 ===========================-->
                 <v-card-text>
                   <v-chip 
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
-                    :selected="tag.selected"
+                    :class="{'primary-selected': tag.selected}"
                     @click="selectHashtag(tag)"
                     >
                     <span :class="tagSize(tag.count)">{{tag.name}}</span> <span class="caption">&nbsp;({{tag.count}})</span>
@@ -132,7 +132,7 @@
                       <v-icon v-if="item.children">
                         {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                       </v-icon>
-                      <a :href="item.url" target="_blank" v-else><img :src="item.favicon"></a>
+                      <a :href="item.url" target="_blank" v-else><img class="favicon" :src="item.favicon"></a>
                     </template>
 
                     <template slot="label" slot-scope="{ item }" >
@@ -157,7 +157,7 @@
 
                   <v-list-tile>
                     <v-list-tile-avatar>
-                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <span>
@@ -169,7 +169,7 @@
 
                   <v-list-tile>
                     <v-list-tile-avatar>
-                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <span>
@@ -178,14 +178,15 @@
                       </span>
                     </v-list-tile-content>
                   </v-list-tile>
+                </v-list>
 
+                <v-list dense>
                   <v-divider inset></v-divider>
-
                   <v-subheader inset>Added this week</v-subheader>
 
                   <v-list-tile>
                     <v-list-tile-avatar>
-                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <span>
@@ -197,7 +198,7 @@
 
                   <v-list-tile>
                     <v-list-tile-avatar>
-                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <span>
@@ -206,14 +207,15 @@
                       </span>
                     </v-list-tile-content>
                   </v-list-tile>
+                </v-list>
 
+                <v-list dense>
                   <v-divider inset></v-divider>
-
                   <v-subheader inset>Added this month</v-subheader>
 
                   <v-list-tile>
                     <v-list-tile-avatar>
-                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <span>
@@ -225,7 +227,7 @@
 
                   <v-list-tile>
                     <v-list-tile-avatar>
-                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
                     </v-list-tile-avatar>
                     <v-list-tile-content>
                       <span>
@@ -539,47 +541,11 @@ export default {
 </script>
 
 <style lang="styl">
-/*
-@import url('https://fonts.googleapis.com/css?family=Open+Sans')
+img.favicon
+  width: 16px
+  height: 16px
 
-@import '~vuetify/src/stylus/settings/_theme'
-
-// set these variables before Vuetify does
-$body-font-family = Roboto
-
-@import '~vuetify/src/stylus/settings/_variables'
-
-// now that the $material-dark hash exists, set the background
-// $material-dark.background = 'green'
-
-// import main to set all styles
-@import '~vuetify/src/stylus/main'
-
-// override the CSS classes using stylus variables
-.display-2
-  font-size: $headings.h6.size !important
-  font-family: $headings.h3.font-family !important
-
-.__cov-progress
-  opacity: 1
-  z-index: 999999
-
-.v-treeview-node
-  overflow: hidden
-  white-space: nowrap
-  text-overflow: ellipsis
-
-.v-card
-  border-radius: .7em
-*/
-
-/*.v-treeview-node--leaf>.v-treeview-node__root,
-.v-treeview-node--leaf>.v-treeview-node__root>.v-treeview-node__content>*:not(.cursor-pointer):not(a) {
-  cursor: default !important;
-}
-
-.cursor-pointer {
-  cursor: pointer !important;
-}*/
+.primary-selected
+  background-color: #bfd3ff !important
 </style>
 
