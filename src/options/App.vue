@@ -75,7 +75,7 @@
             <v-card>
 
 
-
+                
 
                 <!--=====================================
                 =            bookmarks tools            =
@@ -144,6 +144,97 @@
                   </v-treeview>
                 </v-card-text>
 
+
+
+
+
+
+                <!--=====================================
+                =            historical view            =
+                ======================================-->
+                <v-list dense>
+                  <v-subheader inset>Added today</v-subheader>
+
+                  <v-list-tile>
+                    <v-list-tile-avatar>
+                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <span>
+                        <a href="item.url" target="_blank" class="">title</a>
+                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
+                      </span>
+                    </v-list-tile-content>
+                  </v-list-tile>
+
+                  <v-list-tile>
+                    <v-list-tile-avatar>
+                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <span>
+                        <a href="item.url" target="_blank" class="">title</a>
+                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
+                      </span>
+                    </v-list-tile-content>
+                  </v-list-tile>
+
+                  <v-divider inset></v-divider>
+
+                  <v-subheader inset>Added this week</v-subheader>
+
+                  <v-list-tile>
+                    <v-list-tile-avatar>
+                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <span>
+                        <a href="item.url" target="_blank" class="">title</a>
+                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
+                      </span>
+                    </v-list-tile-content>
+                  </v-list-tile>
+
+                  <v-list-tile>
+                    <v-list-tile-avatar>
+                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <span>
+                        <a href="item.url" target="_blank" class="">title</a>
+                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
+                      </span>
+                    </v-list-tile-content>
+                  </v-list-tile>
+
+                  <v-divider inset></v-divider>
+
+                  <v-subheader inset>Added this month</v-subheader>
+
+                  <v-list-tile>
+                    <v-list-tile-avatar>
+                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <span>
+                        <a href="item.url" target="_blank" class="">title</a>
+                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
+                      </span>
+                    </v-list-tile-content>
+                  </v-list-tile>
+
+                  <v-list-tile>
+                    <v-list-tile-avatar>
+                      <img style="width:16px; height:16px;" src="chrome://favicon/https://www.google.ca">
+                    </v-list-tile-avatar>
+                    <v-list-tile-content>
+                      <span>
+                        <a href="item.url" target="_blank" class="">title</a>
+                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
+                      </span>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                </v-list>
 
 
 
@@ -448,6 +539,7 @@ export default {
 </script>
 
 <style lang="styl">
+/*
 @import url('https://fonts.googleapis.com/css?family=Open+Sans')
 
 @import '~vuetify/src/stylus/settings/_theme'
@@ -479,7 +571,7 @@ $body-font-family = Roboto
 
 .v-card
   border-radius: .7em
-
+*/
 
 /*.v-treeview-node--leaf>.v-treeview-node__root,
 .v-treeview-node--leaf>.v-treeview-node__root>.v-treeview-node__content>*:not(.cursor-pointer):not(a) {
