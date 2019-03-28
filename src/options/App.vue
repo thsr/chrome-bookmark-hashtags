@@ -63,7 +63,6 @@
           <v-card-text style="text-align:center; font-size:16px;">
             <p>Add #hashtags to your Chrome bookmarks<br>and manage them easily!</p>
             <a href="https://reallyclevername.io" target="_blank"><i class="fa fa-hand-peace-o" style="font-size:26px;"></i></a>
-            &nbsp;&nbsp;&nbsp; <a href="https://github.com/thsr" target="_blank"><i class="fa fa-github" style="font-size:26px;"></i></a>
           </v-card-text>
         </v-card>
       </v-dialog>
