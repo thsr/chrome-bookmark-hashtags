@@ -111,14 +111,15 @@
                 =            tags            =
                 ===========================-->
                 <v-card-text>
-                  <v-chip 
+                  <div
+                    class="tag-chip"
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
                     :class="{'primary-selected': tag.selected}"
                     @click="selectHashtag(tag)"
                     >
                     <span :class="tagSize(tag.count)">{{tag.name}}</span> <span class="caption">&nbsp;({{tag.count}})</span>
-                  </v-chip>
+                  </div>
                 </v-card-text>
 
 
@@ -503,8 +504,17 @@ img.favicon
 .primary-selected
   background-color: #bfd3ff !important
 
-.v-chip
+.tag-chip
+  display: inline-block
   cursor: pointer
+  color: black
+  background: #ddd
+  margin: .5em
+  padding: .75em
+  border-radius: 2em
+  vertical-align: middle
+  & > span
+    vertical-align: middle
 
 .v-list__tile
   white-space: nowrap
