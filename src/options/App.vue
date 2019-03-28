@@ -29,11 +29,17 @@
 
       <v-spacer></v-spacer>
       
-        <v-btn flat>
+        <v-btn
+          :flat="!(navigation.tab === 'treeView')"
+          :color="(navigation.tab === 'treeView') ? 'secondary' : ''" 
+          @click="navigation.tab = 'treeView'">
           View by folder
         </v-btn>
-      
-        <v-btn flat>
+
+        <v-btn
+          :flat="!(navigation.tab === 'historicalView')"
+          :color="(navigation.tab === 'historicalView') ? 'secondary' : ''" 
+          @click="navigation.tab = 'historicalView'">
           View by date added
         </v-btn>
       
@@ -89,11 +95,11 @@
 
                   <v-divider vertical></v-divider>
 
-                  <v-btn flat @click="doExpandAll">
+                  <v-btn flat @click="doExpandAll" v-if="navigation.tab === 'treeView'">
                     Expand All
                   </v-btn>
 
-                  <v-btn flat @click="doCollapseAll">
+                  <v-btn flat @click="doCollapseAll" v-if="navigation.tab === 'treeView'">
                     Collapse All
                   </v-btn>
                 </v-toolbar>
@@ -122,7 +128,7 @@
                 <!--==============================
                 =            treeview            =
                 ===============================-->
-                <v-card-text>
+                <v-card-text v-if="navigation.tab === 'treeView'">
                   <v-treeview ref="treeview"
                     open-on-click
                     :items="bookmarks.list"
@@ -152,91 +158,22 @@
                 <!--=====================================
                 =            historical view            =
                 ======================================-->
-                <v-list dense>
-                  <v-subheader inset>Added today</v-subheader>
+                <div v-if="navigation.tab !== 'treeView'">
+                  <v-list dense>
+                    <v-list-tile v-for="item in bookmarksHistoricalSorted" :key="item.id">
+                      <v-list-tile-avatar>
+                        <a :href="item.url" target="_blank"><img class="favicon" :src="item.favicon"></a>
+                      </v-list-tile-avatar>
+                      <v-list-tile-content>
+                        <span>
+                          <a :href="item.url" target="_blank" class="bookmark-title">{{item.title}}</a>
+                          <a :href="item.url" target="_blank" class="bookmark-url font-weight-light">{{item.url}}</a>
+                        </span>
+                      </v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </div>
 
-                  <v-list-tile>
-                    <v-list-tile-avatar>
-                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <span>
-                        <a href="item.url" target="_blank" class="">title</a>
-                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
-                      </span>
-                    </v-list-tile-content>
-                  </v-list-tile>
-
-                  <v-list-tile>
-                    <v-list-tile-avatar>
-                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <span>
-                        <a href="item.url" target="_blank" class="">title</a>
-                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
-                      </span>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </v-list>
-
-                <v-list dense>
-                  <v-divider inset></v-divider>
-                  <v-subheader inset>Added this week</v-subheader>
-
-                  <v-list-tile>
-                    <v-list-tile-avatar>
-                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <span>
-                        <a href="item.url" target="_blank" class="">title</a>
-                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
-                      </span>
-                    </v-list-tile-content>
-                  </v-list-tile>
-
-                  <v-list-tile>
-                    <v-list-tile-avatar>
-                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <span>
-                        <a href="item.url" target="_blank" class="">title</a>
-                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
-                      </span>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </v-list>
-
-                <v-list dense>
-                  <v-divider inset></v-divider>
-                  <v-subheader inset>Added this month</v-subheader>
-
-                  <v-list-tile>
-                    <v-list-tile-avatar>
-                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <span>
-                        <a href="item.url" target="_blank" class="">title</a>
-                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
-                      </span>
-                    </v-list-tile-content>
-                  </v-list-tile>
-
-                  <v-list-tile>
-                    <v-list-tile-avatar>
-                      <img class="favicon" src="chrome://favicon/https://www.google.ca">
-                    </v-list-tile-avatar>
-                    <v-list-tile-content>
-                      <span>
-                        <a href="item.url" target="_blank" class="">title</a>
-                        <a href="item.url" target="_blank" class="font-weight-light">url</a>
-                      </span>
-                    </v-list-tile-content>
-                  </v-list-tile>
-                </v-list>
 
 
 
@@ -267,6 +204,7 @@ export default {
         expandAll: false,
         list: [],
         original: [],
+        historical: []
       },
       hashtags: {
         list:[],
@@ -275,6 +213,7 @@ export default {
       searchTermTags: "",
 
       navigation: {
+        tab: 'historicalView'
       },
       dialog: {
         about: false
@@ -294,6 +233,22 @@ export default {
         }
         return 0
       })
+    },
+
+    bookmarksHistoricalSorted: function() {
+      var res = []
+      var mapHistorical = o => {
+        if (o.url) {
+          res.push(o)
+        }
+        if (o.children) { o.children = o.children.map(mapHistorical) }
+        return o
+      }
+      this.bookmarks.list.map(mapHistorical)
+      res = res.sort((a, b) => {
+        return b.dateAdded - a.dateAdded
+      })
+      return res
     },
 
     hashtagsSelected: function() {
@@ -386,17 +341,17 @@ export default {
     
     toggleExpandAll: function(node) {
       this.bookmarks.expandAll = !this.bookmarks.expandAll
-      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+      if (this.navigation.tab === 'treeView') this.$refs.treeview.updateAll(this.bookmarks.expandAll)
     },
     
     doExpandAll: function(node) {
       this.bookmarks.expandAll = true
-      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+      if (this.navigation.tab === 'treeView') this.$refs.treeview.updateAll(this.bookmarks.expandAll)
     },
     
     doCollapseAll: function(node) {
       this.bookmarks.expandAll = false
-      this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+      if (this.navigation.tab === 'treeView') this.$refs.treeview.updateAll(this.bookmarks.expandAll)
     },
     
     refresh: function(node) {
@@ -452,7 +407,7 @@ export default {
       this.bookmarks.list = res
       this.bookmarks.expandAll = true
       setTimeout( () => {
-        this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+        if (this.navigation.tab === 'treeView') this.$refs.treeview.updateAll(this.bookmarks.expandAll)
         this.$Progress.finish()
       }, 30)
     },
@@ -521,7 +476,7 @@ export default {
       this.bookmarks.list = res
       this.bookmarks.expandAll = true
       setTimeout( () => {
-        this.$refs.treeview.updateAll(this.bookmarks.expandAll)
+        if (this.navigation.tab === 'treeView') this.$refs.treeview.updateAll(this.bookmarks.expandAll)
         this.$Progress.finish()
       }, 30)
     },
@@ -547,5 +502,14 @@ img.favicon
 
 .primary-selected
   background-color: #bfd3ff !important
+
+.v-chip
+  cursor: pointer
+
+.v-list__tile
+  white-space: nowrap
+  .bookmark-title, .bookmark-url
+    max-width: 450px
+
 </style>
 
