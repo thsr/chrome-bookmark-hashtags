@@ -7,8 +7,8 @@ import App from './App'
 import Vuetify from 'vuetify'
 Vue.use(Vuetify, {
   theme: {
-    primary: '#689AD4',
-    secondary: '#FFB072',
+    primary: '#1976D2',
+    secondary: '#E69038',
     // accent: '#8c9eff',
     // error: '#b71c1c'
   }

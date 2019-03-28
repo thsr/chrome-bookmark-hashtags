@@ -60,8 +60,10 @@
         </template>
   
         <v-card>
-          <v-card-text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          <v-card-text style="text-align:center; font-size:16px;">
+            <p>Add #hashtags to your Chrome bookmarks<br>and manage them easily!</p>
+            <a href="https://reallyclevername.io" target="_blank"><i class="fa fa-hand-peace-o" style="font-size:26px;"></i></a>
+            &nbsp;&nbsp;&nbsp; <a href="https://github.com/thsr" target="_blank"><i class="fa fa-github" style="font-size:26px;"></i></a>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -116,7 +118,7 @@
                     class="tag-chip"
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
-                    :class="{'secondary': tag.selected}"
+                    :class="{'secondary': tag.selected, 'tag-selected': tag.selected}"
                     @click="selectHashtag(tag)"
                     >
                     <span :class="tagSize(tag.count)">{{tag.name}}</span> <span class="caption">&nbsp;({{tag.count}})</span>
@@ -502,9 +504,6 @@ img.favicon
   width: 16px
   height: 16px
 
-.primary-selected
-  background-color: #bfd3ff !important
-
 .tag-chip
   display: inline-block
   cursor: pointer
@@ -516,6 +515,9 @@ img.favicon
   vertical-align: middle
   & > span
     vertical-align: middle
+
+.tag-selected
+  color: white
 
 .v-list__tile
   white-space: nowrap
