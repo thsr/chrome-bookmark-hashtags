@@ -110,12 +110,13 @@
                 <!--==========================
                 =            tags            =
                 ===========================-->
+<!--                     :style="tag.selected ? {'color': 'white'} : {}" -->
                 <v-card-text>
                   <div
                     class="tag-chip"
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
-                    :class="{'primary-selected': tag.selected}"
+                    :class="{'secondary': tag.selected}"
                     @click="selectHashtag(tag)"
                     >
                     <span :class="tagSize(tag.count)">{{tag.name}}</span> <span class="caption">&nbsp;({{tag.count}})</span>
@@ -329,11 +330,11 @@ export default {
     },
 
     favicon: function(url) {
-      var regex = /^((http[s]?|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+[^#?\s]+)(.*)?(#[\w\-]+)?$/g
+      var regex = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?((www\.)?[^:\/?\n]+)/g
       var groups = regex.exec(url)
       var res = ''
       if (groups) {
-        res = "chrome://favicon/https://" + groups[3]
+        res = "chrome://favicon/https://" + groups[1]
       } else {
         res = "chrome://favicon"
       }
@@ -508,7 +509,7 @@ img.favicon
   display: inline-block
   cursor: pointer
   color: black
-  background: #ddd
+  background: #eee
   margin: .5em
   padding: .75em
   border-radius: 2em
