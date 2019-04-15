@@ -1,7 +1,7 @@
 {
   "name": "Hashtags for Chrome bookmarks",
-  "description": "Add #hashtags to your Chrome bookmarks and manage them easily!",
-  "version": null,
+  "description": "Manage your Chrome bookmarks by adding #hashtags!",
+  "version": "1.0.1",
   "manifest_version": 2,
   "icons": {
     "48": "icons/new.png",
@@ -16,8 +16,7 @@
   },
   "permissions": [
     "bookmarks",
-    "chrome://favicon/",
-    "tabs"
+    "chrome://favicon/"
   ],
   "options_ui": {
     "page": "options/options.html"

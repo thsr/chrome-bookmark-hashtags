@@ -49,8 +49,7 @@
       ===================================-->
       <v-dialog
         v-model="dialog.about"
-        width="500"
-        class="body-1">
+        width="500">
         <template v-slot:activator="{ on }">
           <v-btn
             icon
@@ -61,8 +60,8 @@
   
         <v-card>
           <v-card-text style="text-align:center; font-size:16px;">
-            <p>Add #hashtags to your Chrome bookmarks<br>and manage them easily!</p>
-            <a href="https://reallyclevername.io" target="_blank"><i class="fa fa-hand-peace-o" style="font-size:26px;"></i></a>
+            <p>Manage your Chrome bookmarks<br>by adding #hashtags!</p>
+            <a href="https://reallyclevername.com" target="_blank"><i class="fa fa-hand-peace-o" style="font-size:26px;"></i></a>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -173,6 +172,11 @@
                           <a :href="item.url" target="_blank" class="bookmark-url font-weight-light">{{item.url}}</a>
                         </span>
                       </v-list-tile-content>
+<!--                       <v-list-tile-avatar class="tools">
+
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+
+                      </v-list-tile-avatar> -->
                     </v-list-tile>
                   </v-list>
                 </div>
@@ -219,7 +223,8 @@ export default {
         tab: 'historicalView'
       },
       dialog: {
-        about: false
+        about: false,
+        edit: false
       },
     }
   },
@@ -500,16 +505,16 @@ export default {
 
 <style lang="styl">
 img.favicon
-  width: 16px
-  height: 16px
+  width: 20px
+  height: 20px
 
 .tag-chip
   display: inline-block
   cursor: pointer
   color: black
   background: #eee
-  margin: .5em
-  padding: .75em
+  margin: .25em .5em
+  padding: .5em
   border-radius: 2em
   vertical-align: middle
   & > span
@@ -518,10 +523,23 @@ img.favicon
 .tag-selected
   color: white
 
+.v-btn
+  border-radius: 7px
+
 .v-list__tile
   white-space: nowrap
   .bookmark-title, .bookmark-url
     max-width: 450px
 
+.v-list__tile
+  .v-list__tile__avatar.tools
+    visibility: hidden
+    display: none
+
+.v-list__tile:hover
+  background: #eee
+  .v-list__tile__avatar.tools
+    visibility: visible
+    display: flex
 </style>
 
