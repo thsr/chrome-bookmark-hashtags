@@ -116,7 +116,7 @@
                     class="tag-chip"
                     v-for="tag in hashtagsAlphabetical"
                     :key="tag.name"
-                    :class="{'secondary': tag.selected, 'tag-selected': tag.selected}"
+                    :class="{'secondary': tag.selected, 'tag-selected': tag.selected, 'tag-test': tag.test}"
                     @click="selectHashtag(tag)"
                     >
                     <span :class="tagSize(tag.count)">{{tag.name}}</span> <span class="caption">&nbsp;({{tag.count}})</span>
@@ -179,7 +179,7 @@
                       </v-list-tile-avatar> -->
                     </v-list-tile>
                   </v-list>
-                  <v-card-actions class="justify-center">
+                  <v-card-actions v-if="bookmarksHistoricalSorted.length > bookmarksHistoricalSortedLimit.length" class="justify-center">
                     <v-btn @click="historicalViewLoadMore">Load More</v-btn>
                   </v-card-actions>
                 </div>
@@ -215,7 +215,7 @@ export default {
         list: [],
         original: [],
         historical: [],
-        historicalLimit: 101,
+        historicalLoadMoreLimit: 101,
       },
       hashtags: {
         list:[],
@@ -234,18 +234,6 @@ export default {
   },
 
   computed: {
-    hashtagsAlphabetical: function() {
-      return this.hashtags.list.sort((a, b) => {
-        var nameA = a.name.toUpperCase()
-        var nameB = b.name.toUpperCase()
-        if (nameA < nameB) {
-          return -1
-        } else if (nameA > nameB) {
-          return 1
-        }
-        return 0
-      })
-    },
 
     bookmarksHistoricalSorted: function() {
       var res = []
@@ -264,7 +252,24 @@ export default {
     },
 
     bookmarksHistoricalSortedLimit: function() {
-      var res = this.bookmarksHistoricalSorted.slice(0, this.bookmarks.historicalLimit)
+      var res = this.bookmarksHistoricalSorted.slice(0, this.bookmarks.historicalLoadMoreLimit)
+      return res
+    },
+
+    hashtagsAlphabetical: function() {
+      var res = []
+
+      res = this.hashtags.list.sort((a, b) => {
+        var nameA = a.name.toUpperCase()
+        var nameB = b.name.toUpperCase()
+        if (nameA < nameB) {
+          return -1
+        } else if (nameA > nameB) {
+          return 1
+        }
+        return 0
+      })
+
       return res
     },
 
@@ -276,13 +281,13 @@ export default {
 
     expandAllText: function() {
       return this.bookmarks.expandAll ? "Collapse All" : "Expand All"
-      // return "Show All"
     },
   },
 
   methods: {
     loadBookmarks: function() {
       this.$Progress.start()
+      this.resetHistoricalLoadMoreLimit()
       chrome.bookmarks.getTree((itemTree) => {
         var bookmarks = []
 
@@ -391,8 +396,8 @@ export default {
 
     selectHashtag: function(tag) {
       tag.selected = !tag.selected
-      var hashtagsSelectedToSearch = this.hashtagsSelected.map(o => o.name)
-      this.searchByHashtagAlt(hashtagsSelectedToSearch)
+      var hashtagNameToSearch = this.hashtagsSelected.map(o => o.name)
+      this.searchByHashtagAlt(hashtagNameToSearch)
       
     },
 
@@ -498,21 +503,24 @@ export default {
       }, 30)
     },
 
+    resetHistoricalLoadMoreLimit: function(searchArr) {
+      this.bookmarks.historicalLoadMoreLimit = 101
+    },
 
     navigateToTreeView: function(searchArr) {
       this.navigation.tab = 'treeView'
-      this.bookmarks.historicalLimit = 101
+      this.resetHistoricalLoadMoreLimit()
     },
 
 
     navigateToHistoricalView: function(searchArr) {
       this.navigation.tab = 'historicalView'
-      this.bookmarks.historicalLimit = 101
+      this.resetHistoricalLoadMoreLimit()
     },
 
 
     historicalViewLoadMore: function(searchArr) {
-      this.bookmarks.historicalLimit += 100
+      this.bookmarks.historicalLoadMoreLimit += 100
     },
 
 
@@ -546,6 +554,9 @@ img.favicon
   vertical-align: middle
   & > span
     vertical-align: middle
+
+.tag-test
+  color: red
 
 .tag-selected
   color: white
