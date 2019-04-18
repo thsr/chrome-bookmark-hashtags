@@ -179,10 +179,10 @@
                       </v-list-tile-avatar> -->
                     </v-list-tile>
                   </v-list>
+                  <v-card-actions class="justify-center">
+                    <v-btn @click="historicalViewLoadMore">Load More</v-btn>
+                  </v-card-actions>
                 </div>
-                <v-card-actions>
-                  <v-btn flat @click="historicalViewLoadMore">Load More</v-btn>
-                </v-card-actions>
 
 
 
@@ -264,7 +264,7 @@ export default {
     },
 
     bookmarksHistoricalSortedLimit: function() {
-      var res = this.bookmarksHistoricalSorted.slice(0,101)
+      var res = this.bookmarksHistoricalSorted.slice(0, this.bookmarks.historicalLimit)
       return res
     },
 
