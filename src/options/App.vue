@@ -32,14 +32,14 @@
         <v-btn
           :flat="!(navigation.tab === 'treeView')"
           :color="(navigation.tab === 'treeView') ? 'secondary' : ''" 
-          @click="navigation.tab = 'treeView'">
+          @click="navigateToTreeView">
           View by folder
         </v-btn>
 
         <v-btn
           :flat="!(navigation.tab === 'historicalView')"
           :color="(navigation.tab === 'historicalView') ? 'secondary' : ''" 
-          @click="navigation.tab = 'historicalView'">
+          @click="navigateToHistoricalView">
           View by date added
         </v-btn>
       
@@ -162,7 +162,7 @@
                 ======================================-->
                 <div v-if="navigation.tab !== 'treeView'">
                   <v-list dense>
-                    <v-list-tile v-for="item in bookmarksHistoricalSorted" :key="item.id">
+                    <v-list-tile v-for="item in bookmarksHistoricalSortedLimit" :key="item.id">
                       <v-list-tile-avatar>
                         <a :href="item.url" target="_blank"><img class="favicon" :src="item.favicon"></a>
                       </v-list-tile-avatar>
@@ -180,6 +180,9 @@
                     </v-list-tile>
                   </v-list>
                 </div>
+                <v-card-actions>
+                  <v-btn flat @click="historicalViewLoadMore">Load More</v-btn>
+                </v-card-actions>
 
 
 
@@ -211,7 +214,8 @@ export default {
         expandAll: false,
         list: [],
         original: [],
-        historical: []
+        historical: [],
+        historicalLimit: 101,
       },
       hashtags: {
         list:[],
@@ -256,6 +260,11 @@ export default {
       res = res.sort((a, b) => {
         return b.dateAdded - a.dateAdded
       })
+      return res
+    },
+
+    bookmarksHistoricalSortedLimit: function() {
+      var res = this.bookmarksHistoricalSorted.slice(0,101)
       return res
     },
 
@@ -488,6 +497,24 @@ export default {
         this.$Progress.finish()
       }, 30)
     },
+
+
+    navigateToTreeView: function(searchArr) {
+      this.navigation.tab = 'treeView'
+      this.bookmarks.historicalLimit = 101
+    },
+
+
+    navigateToHistoricalView: function(searchArr) {
+      this.navigation.tab = 'historicalView'
+      this.bookmarks.historicalLimit = 101
+    },
+
+
+    historicalViewLoadMore: function(searchArr) {
+      this.bookmarks.historicalLimit += 100
+    },
+
 
   },
 
